@@ -39,24 +39,20 @@ class User extends CI_Controller
 
     private function verify_request()
     {
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            $headers = $this->input->request_headers();
-            $token = $headers['Authorization'];
-            try {
-                $data = JWT::validateToken($token);
-                if ($data === false) {
-                    $response = ['code' => 401, 'message' => 'Unauthorized Access! A'];
-                    $this->response($response, 401);
-                    exit();
-                } else {
-                    return $data;
-                }
-            } catch (Exception $e) {
-                $response = ['code' => 401, 'message' => 'Unauthorized Access! B'];
+        $headers = $this->input->request_headers();
+        $token = $headers['Authorization'];
+        try {
+            $data = JWT::validateToken($token);
+            if ($data === false) {
+                $response = ['code' => 401, 'message' => 'Unauthorized Access! A'];
                 $this->response($response, 401);
+                exit();
+            } else {
+                return $data;
             }
-        } else {
-            $this->response(['code' => 401, 'message' => 'Invalid Access'], 401);
+        } catch (Exception $e) {
+            $response = ['code' => 401, 'message' => 'Unauthorized Access! B'];
+            $this->response($response, 401);
         }
     }
 
