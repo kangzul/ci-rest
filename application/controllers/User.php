@@ -33,26 +33,31 @@ class User extends CI_Controller
             $response = ['code' => 200, 'message' => 'Successful', 'data' => ['token' => $token]];
             $this->response($response, 200);
         } else {
-            $this->response(['code' => 404, 'message' => 'Invalid username or password!'], 404);
+            $this->response(['code' => 404, 'message' => 'Invalid username or password!'], 200);
         }
     }
 
     private function verify_request()
     {
         $headers = $this->input->request_headers();
-        $token = $headers['Authorization'];
-        try {
-            $data = JWT::validateToken($token);
-            if ($data === false) {
-                $response = ['code' => 401, 'message' => 'Unauthorized Access! A'];
-                $this->response($response, 401);
-                exit();
-            } else {
-                return $data;
+        if (array_key_exists('Authorization', $headers)) {
+            $token = $headers['Authorization'];
+            try {
+                $data = JWT::validateToken($token);
+                if ($data === false) {
+                    $response = ['code' => 401, 'message' => 'Unauthorized Access! A'];
+                    $this->response($response, 200);
+                    exit();
+                } else {
+                    return $data;
+                }
+            } catch (Exception $e) {
+                $response = ['code' => 401, 'message' => 'Unauthorized Access! B'];
+                $this->response($response, 200);
             }
-        } catch (Exception $e) {
-            $response = ['code' => 401, 'message' => 'Unauthorized Access! B'];
-            $this->response($response, 401);
+        } else {
+            $response = ['code' => 401, 'message' => 'Authorization Not Found'];
+            $this->response($response, 200);
         }
     }
 
